@@ -14,11 +14,10 @@ Date: 2021/08/08
 
 import PIL
 from PIL import Image, ImageOps
-import requests
-
-from io import BytesIO
-from PIL import ImageFilter
-from PIL import ImageEnhance
+# import requests
+# from io import BytesIO
+# from PIL import ImageFilter
+# from PIL import ImageEnhance
 # from IPython.display import display
 from math import floor
 import random
