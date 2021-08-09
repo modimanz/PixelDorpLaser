@@ -21,6 +21,7 @@ from PIL import ImageFilter
 from PIL import ImageEnhance
 # from IPython.display import display
 from math import floor
+import random
 
 import os
 
@@ -107,6 +108,54 @@ class LaserImage:
             return True
         return False
 
+    def swap_colors(self, i=8, shuffle=False, black=False):
+
+        # Make the new Laser image
+        self.image_laser = Image.new("RGB", self.image_gray.size)
+
+        # Paste the gray image data
+        self.image_laser.paste(self.image_gray)
+
+        # Show for good measure
+        # self.image_laser.show()
+
+        self.image_laser.convert(mode='P', colors=8, dither=1)
+
+        pix = self.image_laser.load()
+
+        # Get image dimensions
+        image_x, image_y = self.image_laser.size
+
+        if shuffle:
+            random.shuffle(c_list)
+
+        # Iterate Pixels - divide intensities by (color_val/floor(colors_bits/number_colors))
+        for y in range(image_y):
+            for x in range(image_x):
+
+                # Get current Pixel Data
+                r = pix[x, y][0]
+
+                # Determine and lookup New Color
+
+                color_id = floor(r/32)
+
+                if i==8:
+                    new_pixel_color = c_list[color_id]
+                elif i==color_id:
+                    if black:
+                        new_pixel_color = (0, 0, 0)
+                    else:
+                        new_pixel_color = c_list[color_id]
+                else:
+                    new_pixel_color = (255, 255, 255)
+
+                if r > 240:
+                    new_pixel_color = (255, 255, 255)
+
+                # Write the new pixel data
+                pix[x, y] = new_pixel_color
+
     def convert_to_laser_color(self, threshold=False):
         """
         Convert grayscale image to color levels for defining intensity
@@ -116,43 +165,22 @@ class LaserImage:
 
         if self.image_gray:
 
-            # Make the new Laser image
-            self.image_laser = Image.new("RGB", self.image_gray.size)
-
-            # Paste the gray image data
-            self.image_laser.paste(self.image_gray)
-
-            # Show for good measure
-            #self.image_laser.show()
-
-            # Get image dimensions
-            image_x, image_y = self.image_laser.size
-
-            self.image_laser.convert(mode='P', colors=8, dither=1)
-
-            pix = self.image_laser.load()
-
-            # Iterate Pixels - divide intensities by (color_val/floor(colors_bits/number_colors))
-            for y in range(image_y):
-                for x in range(image_x):
-
-                    # Get current Pixel Data
-                    r = pix[x, y][0]
-
-                    # Determine and lookup New Color
-
-                    new_pixel_color = c_list[floor(r / 32)]
-
-                    if r > 240:
-                        new_pixel_color = (255, 255, 255)
-
-                    # Write the new pixel data
-                    pix[x, y] = new_pixel_color
+            self.swap_colors(shuffle=False)
 
             # Write the new image to a file
-            self.image_laser_path = self.image_file + "_new.jpg"
-            print(self.image_laser_path)
-            self.image_laser.save(self.image_laser_path, "JPEG")
+            self.image_laser_path = self.image_file + "_new2.jpg"
+            self.save_image(self.image_laser_path)
+
+        if threshold:
+            for i in range(threshold):
+                self.swap_colors(i, False, True)
+                #self.image_laser.convert("L")
+                self.save_image(self.image_file + "_" + str(i) + ".jpg")
+
+    def save_image(self, name):
+        print(name)
+        if self.image_laser:
+            self.image_laser.save(name, "JPEG")
 
     def convert_to_layers(self):
         """
@@ -165,10 +193,10 @@ if __name__ == '__main__':
 
     dorp = LaserImage()
 
-    dorp.get_image_from_path(os.path.join('d:', 'share', 'LaserCutting', 'bikini.jpg'))
+    dorp.get_image_from_path(os.path.join('d:', 'share', 'LaserCutting', '685208.jpg'))
 
     dorp.convert_to_grayscale()
 
-    dorp.convert_to_laser_color()
+    dorp.convert_to_laser_color(8)
 
     pass
