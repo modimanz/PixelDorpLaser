@@ -1,7 +1,7 @@
 """
 PixelDorpLaser
 
-Description: We are going to turn a beutiful colorful image into grayscale.
+Description: We are going to turn a beautiful colorful image into grayscale.
 then we are going to colorize it into 8 colors that will be defined by different
 laser scanning profile when we print on the laser printer.   What will happen??? I
 guess we will find out soon.
